@@ -1,6 +1,7 @@
 let current=0;
 const slides=document.querySelectorAll('.slide');
 const revealTimers=new Map();
+const nextBtn=document.getElementById('nextBtn');
 
 function prepareReveal(slide){
   if(!slide)return;
@@ -42,9 +43,21 @@ function animateReveal(slide){
   requestAnimationFrame(()=>requestAnimationFrame(()=>words.forEach(word=>word.classList.add('show-word'))));
 }
 
+function updateControls(){
+  if(!nextBtn)return;
+  if(current===slides.length-1){
+    nextBtn.textContent='إعادة العرض';
+    nextBtn.onclick=()=>show(0);
+  }else{
+    nextBtn.textContent='التالي';
+    nextBtn.onclick=()=>next();
+  }
+}
+
 function show(n){
   current=(n+slides.length)%slides.length;
   slides.forEach((s,i)=>s.classList.toggle('active',i===current));
+  updateControls();
   animateReveal(slides[current]);
 }
 function next(){show(current+1)}
@@ -65,4 +78,9 @@ document.addEventListener('touchend',e=>{if(startX===null)return;let dx=e.change
 if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
   document.documentElement.classList.add('reduced-motion');
 }
+
+const controlsStyle=document.createElement('style');
+controlsStyle.textContent='.controls{position:absolute!important;z-index:20;bottom:12px!important;top:auto!important;left:50%!important;transform:translateX(-50%)!important}.slide{padding-bottom:96px!important}@media(max-width:480px){.controls{bottom:6px!important}.slide{padding-bottom:82px!important}}';
+document.head.appendChild(controlsStyle);
+
 show(0);
